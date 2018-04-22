@@ -40,7 +40,7 @@ import org.topicquests.support.api.IResult;
 import org.topicquests.ks.api.ICoreIcons;
 import org.topicquests.ks.api.ITQCoreOntology;
 import org.topicquests.ks.api.ITicket;
-import org.topicquests.ks.tm.api.ISubjectProxy;
+import org.topicquests.ks.tm.api.IProxy;
 
 /**
  * @author park
@@ -95,15 +95,15 @@ public class TopicMapHandler  extends BaseHandler {
 			//TODO: note: we are ignoring any SORT modifiers
 			//This really returns some live cargo in the form of a list of user objects in JSON format
 			// We are restricting this to: name, email, avatar, homepage, geolocation, role
-			r = model.listUserTopics(start, count, sortBy, sortDir, credentials);
+			r = model.listUserTopics(start, count, credentials);
 			if (r.hasError()) {
 				code = BaseHandler.RESPONSE_INTERNAL_SERVER_ERROR;
 				message = r.getErrorString();
 			} else {
 				//Time to take that list apart
 				if (r.getResultObject() != null) {
-					List<ISubjectProxy> usrs = (List<ISubjectProxy>)r.getResultObject();
-					Iterator<ISubjectProxy>itr = usrs.iterator();
+					List<IProxy> usrs = (List<IProxy>)r.getResultObject();
+					Iterator<IProxy>itr = usrs.iterator();
 					List<JSONObject>jsonUsers = new ArrayList<JSONObject>();
 					while (itr.hasNext()) {
 						jsonUsers.add((JSONObject)itr.next().getData());
@@ -122,7 +122,7 @@ public class TopicMapHandler  extends BaseHandler {
 			r = model.getTopic(locator, credentials);
 			System.out.println("GETTOPIC "+r.getResultObject());
 			if (r.getResultObject() != null) {
-				ISubjectProxy n = (ISubjectProxy)r.getResultObject();
+				IProxy n = (IProxy)r.getResultObject();
 				System.out.println("GETTOPIC "+n);
 				returnMessage.put(ICredentialsMicroformat.CARGO, (JSONObject)n.getData());
 				code = BaseHandler.RESPONSE_OK;
@@ -152,15 +152,15 @@ public class TopicMapHandler  extends BaseHandler {
 			//TODO: note: we are ignoring any SORT modifiers
 			//This really returns some live cargo in the form of a list of user objects in JSON format
 			// We are restricting this to: name, email, avatar, homepage, geolocation, role
-			r = model.listInstanceTopics(typeLocator, start, count, sortBy, sortDir, credentials);
+			r = model.listInstanceTopics(typeLocator, start, count, credentials);
 			if (r.hasError()) {
 				code = BaseHandler.RESPONSE_INTERNAL_SERVER_ERROR;
 				message = r.getErrorString();
 			} else {
 				//Time to take that list apart
 				if (r.getResultObject() != null) {
-					List<ISubjectProxy> usrs = (List<ISubjectProxy>)r.getResultObject();
-					Iterator<ISubjectProxy>itr = usrs.iterator();
+					List<IProxy> usrs = (List<IProxy>)r.getResultObject();
+					Iterator<IProxy>itr = usrs.iterator();
 					List<JSONObject>jsonUsers = new ArrayList<JSONObject>();
 					while (itr.hasNext()) {
 						jsonUsers.add((JSONObject)itr.next().getData());
@@ -198,8 +198,8 @@ public class TopicMapHandler  extends BaseHandler {
 			} else {
 				//Time to take that list apart
 				if (r.getResultObject() != null) {
-					List<ISubjectProxy> usrs = (List<ISubjectProxy>)r.getResultObject();
-					Iterator<ISubjectProxy>itr = usrs.iterator();
+					List<IProxy> usrs = (List<IProxy>)r.getResultObject();
+					Iterator<IProxy>itr = usrs.iterator();
 					List<JSONObject>jsonUsers = new ArrayList<JSONObject>();
 					while (itr.hasNext()) {
 						jsonUsers.add((JSONObject)itr.next().getData());
@@ -234,15 +234,15 @@ public class TopicMapHandler  extends BaseHandler {
 			//TODO: note: we are ignoring any SORT modifiers
 			//This really returns some live cargo in the form of a list of user objects in JSON format
 			// We are restricting this to: name, email, avatar, homepage, geolocation, role
-			r = model.listSubclassTopics(superClassLocator, start, count, sortBy, sortDir, credentials);
+			r = model.listSubclassTopics(superClassLocator, start, count, credentials);
 			if (r.hasError()) {
 				code = BaseHandler.RESPONSE_INTERNAL_SERVER_ERROR;
 				message = r.getErrorString();
 			} else {
 				//Time to take that list apart
 				if (r.getResultObject() != null) {
-					List<ISubjectProxy> usrs = (List<ISubjectProxy>)r.getResultObject();
-					Iterator<ISubjectProxy>itr = usrs.iterator();
+					List<IProxy> usrs = (List<IProxy>)r.getResultObject();
+					Iterator<IProxy>itr = usrs.iterator();
 					List<JSONObject>jsonUsers = new ArrayList<JSONObject>();
 					while (itr.hasNext()) {
 						jsonUsers.add((JSONObject)itr.next().getData());
@@ -281,8 +281,8 @@ public class TopicMapHandler  extends BaseHandler {
 			} else {
 				//Time to take that list apart
 				if (r.getResultObject() != null) {
-					List<ISubjectProxy> usrs = (List<ISubjectProxy>)r.getResultObject();
-					Iterator<ISubjectProxy>itr = usrs.iterator();
+					List<IProxy> usrs = (List<IProxy>)r.getResultObject();
+					Iterator<IProxy>itr = usrs.iterator();
 					List<JSONObject>jsonUsers = new ArrayList<JSONObject>();
 					while (itr.hasNext()) {
 						jsonUsers.add((JSONObject)itr.next().getData());
@@ -321,7 +321,7 @@ public class TopicMapHandler  extends BaseHandler {
 			r = model.getNodeTree(rootLocator, depth, start, count, sortBy, sortDir, credentials);
 			//Treat the result just as if it's a SubjectProxy, which it is
 			if (r.getResultObject() != null) {
-				ISubjectProxy n = (ISubjectProxy)r.getResultObject();
+				IProxy n = (IProxy)r.getResultObject();
 				System.out.println("LOADTREE "+n);
 				returnMessage.put(ICredentialsMicroformat.CARGO, (JSONObject)n.getData());
 				code = BaseHandler.RESPONSE_OK;
@@ -365,9 +365,9 @@ public class TopicMapHandler  extends BaseHandler {
 		} else if (verb.equals(ITopicMapMicroformat.GET_TOPIC_BY_URL)) {
 			String url = jsonObject.getAsString(ITQCoreOntology.RESOURCE_URL_PROPERTY);
 			if (url != null) {
-				r = model.listTopicsByURL(url, 0, -1, null, null, credentials);
+				r = model.getTopicByURL(url, credentials);
 				if (r.getResultObject() != null) {
-					ISubjectProxy n = (ISubjectProxy)r.getResultObject();
+					IProxy n = (IProxy)r.getResultObject();
 					System.out.println("GETTOPICBYURL "+n);
 					returnMessage.put(ICredentialsMicroformat.CARGO, (JSONObject)n.getData());
 					code = BaseHandler.RESPONSE_OK;
@@ -401,7 +401,7 @@ public class TopicMapHandler  extends BaseHandler {
 		if (verb.equals(ITopicMapMicroformat.PUT_TOPIC)) {
 			if (cargo != null) {
 				r = model.putTopic(cargo);
-				returnMessage.put(ICredentialsMicroformat.CARGO, ((ISubjectProxy)r.getResultObject()).getData());
+				returnMessage.put(ICredentialsMicroformat.CARGO, ((IProxy)r.getResultObject()).getData());
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";
 			} else {
@@ -409,17 +409,17 @@ public class TopicMapHandler  extends BaseHandler {
 				environment.logError(x, null);
 				throw new ServletException(x);
 			}
-		} else if (verb.equals(ITopicMapMicroformat.UPDATE_TOPIC)) {
+		/*} else if (verb.equals(ITopicMapMicroformat.UPDATE_TOPIC)) {
 			if (cargo != null) {
 				r = model.updateTopic(cargo, true);
-				returnMessage.put(ICredentialsMicroformat.CARGO, ((ISubjectProxy)r.getResultObject()).getData());
+				returnMessage.put(ICredentialsMicroformat.CARGO, ((IProxy)r.getResultObject()).getData());
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";
 			} else {
 				String x = IErrorMessages.MISSING_TOPIC+"-TMServletPost-1-"+verb;
 				environment.logError(x, null);
 				throw new ServletException(x);
-			}
+			}*/
 		} else if (verb.equals(ITopicMapMicroformat.UPDATE_TOPIC_TEXT_FIELDS)) {
 			if (cargo != null) {
 				String lox = cargo.getAsString("locator");
@@ -440,7 +440,7 @@ public class TopicMapHandler  extends BaseHandler {
 			if (cargo != null) {
 				System.out.println("CARGO "+cargo.toJSONString());
 				r = model.newInstanceNode(cargo, credentials);
-				returnMessage.put(ICredentialsMicroformat.CARGO, ((ISubjectProxy)r.getResultObject()).getData());
+				returnMessage.put(ICredentialsMicroformat.CARGO, ((IProxy)r.getResultObject()).getData());
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";
 			} else {
@@ -451,7 +451,7 @@ public class TopicMapHandler  extends BaseHandler {
 		} else if (verb.equals(ITopicMapMicroformat.NEW_SUBCLASS_TOPIC)) {
 			if (cargo != null) {
 				r = model.newSubclassNode(cargo, credentials);
-				returnMessage.put(ICredentialsMicroformat.CARGO, ((ISubjectProxy)r.getResultObject()).getData());
+				returnMessage.put(ICredentialsMicroformat.CARGO, ((IProxy)r.getResultObject()).getData());
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";
 			} else {
@@ -482,7 +482,7 @@ public class TopicMapHandler  extends BaseHandler {
 					lox = locator;
 				r = conModel.newConversationNode(nodeType, parentLoc, contextLoc, lox, label, det, language, url, userId, isPrivate);
 				if (r.getResultObject() != null) {
-					ISubjectProxy n = (ISubjectProxy)r.getResultObject();
+					IProxy n = (IProxy)r.getResultObject();
 					System.out.println("GETTOPICBYURL "+n);
 					returnMessage.put(ICredentialsMicroformat.CARGO, n.getData());
 					code = BaseHandler.RESPONSE_OK;
@@ -504,11 +504,12 @@ public class TopicMapHandler  extends BaseHandler {
 				String targetLoc = cargo.getAsString(ITopicMapMicroformat.REL_TRG_LOCATOR);
 				String smallIcon = ICoreIcons.RELATION_ICON_SM;
 				String largeIcon = ICoreIcons.RELATION_ICON;
+				String provenanceLocator = cargo.getAsString(ITopicMapMicroformat.PROVENANCE_LOCATOR);
 				System.out.println("THM.add "+sourceLoc+" | "+targetLoc+" | "+relTypeLoc);
 				if (relTypeLoc == null) {
 					throw new ServletException(cargo.toJSONString());
 				}
-				r = model.addRelation(sourceLoc, targetLoc, relTypeLoc, smallIcon, largeIcon, false, false, credentials);
+				r = model.addRelation(sourceLoc, targetLoc, relTypeLoc, provenanceLocator, smallIcon, largeIcon, false, false, credentials);
 				returnMessage.put(ICredentialsMicroformat.CARGO, "Relation Done");
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";
@@ -536,7 +537,8 @@ public class TopicMapHandler  extends BaseHandler {
 			String language  = notNullString(jsonObject.getAsString(ITopicMapMicroformat.LANGUAGE));
 			String userId  = notNullString(jsonObject.getAsString(ICredentialsMicroformat.USER_ID));
 			JSONObject tagLabels = (JSONObject)jsonObject.get(ITopicMapMicroformat.LIST_PROPERTY);
-			r = model.findOrCreateBookmark(url, title, details, language, userId, tagLabels, credentials);
+			String provenanceLocator = cargo.getAsString(ITopicMapMicroformat.PROVENANCE_LOCATOR);
+			r = model.findOrCreateBookmark(url, title, details, language, userId, provenanceLocator, tagLabels, credentials);
 			environment.logDebug("CondoHandler.FindOrCreateBookmark "+r.getErrorString()+" | "+r.getResultObject());
 			if (!r.hasError()) {
 				code = BaseHandler.RESPONSE_OK;

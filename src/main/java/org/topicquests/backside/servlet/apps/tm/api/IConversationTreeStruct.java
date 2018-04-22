@@ -18,7 +18,7 @@ package org.topicquests.backside.servlet.apps.tm.api;
 import java.util.List;
 
 import net.minidev.json.JSONObject;
-import org.topicquests.ks.tm.api.ISubjectProxy;
+import org.topicquests.ks.tm.api.IProxy;
 
 /**
  * @author jackpark

@@ -32,7 +32,7 @@ public interface ITopicMapMicroformat extends ICredentialsMicroformat {
 		//POST
 
 		PUT_TOPIC				= "PutTopic",
-		UPDATE_TOPIC			= "UpdateTopic",
+		//UPDATE_TOPIC			= "UpdateTopic",
 		UPDATE_TOPIC_TEXT_FIELDS= "UpdateTextFields",
 		REMOVE_TOPIC			= "RemTopic",
 		//followed by cargo with specs for the topic,
@@ -84,6 +84,7 @@ public interface ITopicMapMicroformat extends ICredentialsMicroformat {
 		REL_SRC_LOCATOR					= "RelSrcLoc",
 		REL_TRG_LOCATOR					= "RelTrgLoc",
 		REL_TYPE_LOCATOR				= "RelTypLoc",
+		PROVENANCE_LOCATOR				= "ProvLox",
 		TOPIC_LABEL			= ITQCoreOntology.LABEL_PROPERTY,
 		TOPIC_DETAILS		= ITQCoreOntology.DETAILS_PROPERTY,
 		LIST_PROPERTY		= "ListProperty",

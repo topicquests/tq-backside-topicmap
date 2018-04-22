@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.topicquests.support.api.IResult;
 import org.topicquests.ks.api.ITicket;
-import org.topicquests.ks.tm.api.ISubjectProxy;
+import org.topicquests.ks.tm.api.IProxy;
 
 /**
  * @author park
@@ -35,5 +35,5 @@ public interface ITagModel {
 	 * @param credentials
 	 * @return
 	 */
-	IResult addTagsToNode(ISubjectProxy node, List<String> tagNames, ITicket credentials);
+	IResult addTagsToNode(IProxy node, List<String> tagNames, ITicket credentials);
 }
