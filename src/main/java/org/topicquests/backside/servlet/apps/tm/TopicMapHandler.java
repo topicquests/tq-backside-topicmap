@@ -440,6 +440,7 @@ public class TopicMapHandler  extends BaseHandler {
 			if (cargo != null) {
 				System.out.println("CARGO "+cargo.toJSONString());
 				r = model.newInstanceNode(cargo, credentials);
+				environment.logDebug("TopicMapHandler.newInstance "+r.getErrorString()+" "+r.getResultObject());
 				returnMessage.put(ICredentialsMicroformat.CARGO, ((IProxy)r.getResultObject()).getData());
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";

@@ -4,7 +4,7 @@
     <groupId>org.topicquests</groupId>
     <artifactId>tq-backside-topicmap</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
     <name>tq-backside-topicmap</name>
     <url>https://github.com/topicquests/tq-backside-topicmap</url>
     <developers>
@@ -19,12 +19,6 @@
             <name>Mark Szpakowski</name>
             <url>https://github.com/markszpak</url>
             <id>markszpak</id>
-        </developer>
-        <developer>
-            <email>alec@wenzowski.com</email>
-            <name>Alec Wenzowski</name>
-            <url>https://github.com/wenzowski</url>
-            <id>wenzowski</id>
         </developer>
     </developers>
     <organization>

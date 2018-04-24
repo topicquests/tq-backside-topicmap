@@ -91,7 +91,7 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 	 */
 	@Override
 	public IResult getTopic(String topicLocator, ITicket credentials) {
-		return topicMap.getNode(topicLocator, credentials);
+		return topicMap.getFullNode(topicLocator, credentials);
 	}
 
 	/* (non-Javadoc)
@@ -290,17 +290,13 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 
 	@Override
 	public IResult newInstanceNode(JSONObject theTopicShell, ITicket credentials) {
-	//	System.out.println("CARGO2 "+theTopicShell.toJSONStringString());
-	//	System.out.println("LOX "+theTopicShell.get("lox"));
 		IResult result  = new ResultPojo();
 		environment.logDebug("TopicMapModel.newInstanceNode- "+theTopicShell.toJSONString());
-		//{"uName":"joe","isPrv":"F","sIco":"\/images\/bookmark_sm.png","Lang":"en",
-		//"label":"Tech Reports | Knowledge Media Institute | The Open University",
-		//"lIco":"\/images\/bookmark.png","inOf":"BookmarkNodeType","url":"http:\/\/kmi.open.ac.uk\/publications\/techreport\/kmi-10-01"}
-		
-		//{"crtr":"jackpark","sIco":"\/images\/publication_sm.png","isPrv":"F",
-		//"Lang":"en","details":"Modified TQElasticKnowledgeSystem","label":"Another try after fixes to the topic map",
-		//"lIco":"\/images\/publication.png","inOf":"BlogNodeType"}
+		//{"uId":"SystemUser",
+		//"lox":"28bc48f5-ebf7-43e2-b4da-7df44984ecbd","isPrv":"F",
+		//"Lang":"en",
+		//"details":"Made by devtests\/NodeBulder",
+		//"label":"Hello World","inOf":"ClassType"}
 		String locator = theTopicShell.getAsString(ITopicMapMicroformat.TOPIC_LOCATOR);
 		String typeLocator =  theTopicShell.getAsString(ITopicMapMicroformat.PARENT_LOCATOR);
 		String lang = theTopicShell.getAsString(ITopicMapMicroformat.LANGUAGE);
@@ -318,9 +314,12 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 				provenanceLocator = (String)op;
 			else
 				provenanceLocator = ((List<String>)op).get(0); //TODO that's a hack
-		}		
+		}
+		environment.logDebug("TopicMapModel.newInstanceNode-x "+locator+" | "+typeLocator+" | "+
+				label+" | "+description+" | "+lang+" "+userId);
+
 		//Added feature
-		JSONObject extras = (JSONObject)theTopicShell.get(ITopicMapMicroformat.EXTRAS);
+		JSONObject extras = null;//(JSONObject)theTopicShell.get(ITopicMapMicroformat.EXTRAS);
 		if (extras != null)
 			System.out.println("NEWINSTANCE "+extras.toJSONString());
 		boolean isPrivate = false;
@@ -330,22 +329,28 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 		IProxy n = null;
 		environment.logDebug("TopicMapModel.newInstanceNode-1 "+locator);
 		if (locator != null) {
+			environment.logDebug("TopicMapModel.newInstanceNode-a ");
 			//First, see if this exists
 			r = topicMap.getNode(locator, systemCredentials);
+			environment.logDebug("TopicMapModel.newInstanceNode-b "+r.getErrorString()+" | "+r.getResultObject());
 			if (r.hasError())
 				result.addErrorString(r.getErrorString());
 			n = (IProxy)r.getResultObject();
-			result.setResultObject(n);
-			return result;
-			//if (r.getResultObject() != null)
-			//	return r;
-			//n = nodeModel.newInstanceNode(locator, typeLocator, label, description, lang, userId, smallImagePath, largeImagePath, isPrivate);
-		} else {
-			n = nodeModel.newInstanceNode(typeLocator, label, description, lang, userId, 
-					provenanceLocator, smallImagePath, largeImagePath, isPrivate);
-			if (url != null && !url.equals(""))
-				n.setURL(url);
-			if (extras != null) {
+			environment.logDebug("TopicMapModel.newInstanceNode-c "+r.getErrorString()+" | "+r.getResultObject());
+			if (r.getResultObject() != null) {
+				result.setResultObject(n);
+				return result;
+			}
+			environment.logDebug("TopicMapModel.newInstanceNode-d "+locator+" | "+typeLocator+" | "+
+					label+" | "+description+" | "+lang+" "+userId);
+			n = nodeModel.newInstanceNode(locator, typeLocator, label, description, lang, userId, provenanceLocator, smallImagePath, largeImagePath, isPrivate);
+		} else 
+			n = nodeModel.newInstanceNode(typeLocator, label, description, lang, userId, provenanceLocator, smallImagePath, largeImagePath, isPrivate);
+		
+		environment.logDebug("TopicMapModel.newInstanceNode-2 "+n.toJSONString());
+		if (url != null && !url.equals(""))
+			n.setURL(url);
+	/*		if (extras != null) {
 				JSONObject jo = n.getData();
 				Iterator<String>itr = extras.keySet().iterator();
 				String key;
@@ -368,7 +373,7 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 						icon = pnt.getSmallImage();
 						subject = pnt.getLabel(lang);
 						//Add a child to the parent
-						nodeModel.addChildNode(pnt, context, n.getLocator(), transclude);
+						nodeModel.addChildNode(pnt,context, n.getLocator(), transclude);
 						//pnt.addChildNode(context, smallImagePath, n.getLocator(), label, transclude);
 						pnt.setLastEditDate(new Date());
 						r = topicMap.putNode(pnt);
@@ -387,17 +392,15 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 						jo.put(key, extras.get(key));
 					}
 				}
-			}
-			if (n.getLocator() == null) {
-				environment.logError("Missing lox for "+typeLocator+" | "+label, null);
-			}
-			r = topicMap.putNode(n);
-			if (r.hasError())
-				result.addErrorString(r.getErrorString());
-			environment.logDebug("TopicMapModel.newInstance-1 "+r.getErrorString()+" | "+n.toJSONString());
+			}*/
+		if (n.getLocator() == null) {
+			environment.logError("Missing lox for "+typeLocator+" | "+label, null);
 		}
+		r = topicMap.putNode(n);
+		if (r.hasError())
+			result.addErrorString(r.getErrorString());
+		environment.logDebug("TopicMapModel.newInstanceNode-3 "+r.getErrorString()+" | "+n.toJSONString());
 		
-		environment.logDebug("TopicMapModel.newInstance-2 "+n.toJSONString());
 		r = relateNodeToUser(n, userId, provenanceLocator, credentials);
 		if (r.hasError())
 			result.addErrorString(r.getErrorString());
@@ -410,10 +413,11 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 
 	@Override
 	public IResult newSubclassNode(JSONObject theTopicShell, ITicket credentials) {
+		environment.logDebug("TopicMapModel.newSubclassNode- "+theTopicShell.toJSONString());
 		String locator = theTopicShell.getAsString(ITopicMapMicroformat.TOPIC_LOCATOR);
 		String superClassLocator =  theTopicShell.getAsString(ITopicMapMicroformat.SUPERTYPE_LOCATOR);
 		String lang = theTopicShell.getAsString(ITopicMapMicroformat.LANGUAGE);
-		String userId = theTopicShell.getAsString(ITQCoreOntology.CREATOR_ID_PROPERTY);
+		String userId = theTopicShell.getAsString(ICredentialsMicroformat.USER_ID);
 		String label = theTopicShell.getAsString(ITopicMapMicroformat.TOPIC_LABEL);
 		String description = theTopicShell.getAsString(ITopicMapMicroformat.TOPIC_DETAILS);
 		String smallImagePath = theTopicShell.getAsString(ITopicMapMicroformat.SMALL_IMAGE_PATh);
@@ -427,6 +431,8 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 			else
 				provenanceLocator = ((List<String>)op).get(0); //TODO that's a hack
 		}
+		environment.logDebug("TopicMapModel.newSubclassNode-x "+locator+" | "+superClassLocator+" | "+
+				label+" | "+description+" | "+lang+" "+userId);
 		boolean isPrivate = false;
 		IResult r;
 		if (isp.equalsIgnoreCase("t"))
@@ -435,14 +441,17 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 		if (locator != null) {
 			//First, see if this exists
 			r = topicMap.getNode(locator, systemCredentials);
-			if (r.getResultObject() != null)
+			n = (IProxy)r.getResultObject();
+			if (r.getResultObject() != null) {
+				r.setResultObject(n);
 				return r;
+			}
 			n = nodeModel.newSubclassNode(locator, superClassLocator, label, description, lang, userId, provenanceLocator, smallImagePath, largeImagePath, isPrivate);
 		} else
 			n = nodeModel.newSubclassNode(superClassLocator, label, description, lang, userId, provenanceLocator, smallImagePath, largeImagePath, isPrivate);
 			
 		IResult result = topicMap.putNode(n);
-		result.setResultObject(n.getData());
+		result.setResultObject(n);
 		r = relateNodeToUser(n, userId, provenanceLocator, credentials);
 		if (r.hasError())
 			result.addErrorString(r.getErrorString());
