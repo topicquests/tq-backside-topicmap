@@ -104,14 +104,22 @@ public class StructuredConversationModel extends BaseModel implements IStructure
 				provenanceLocator,
 				smallIcon, largeIcon, isPrivate);
 		System.out.println("SCM-1 "+parentLocator+" "+contextLocator);
-		//TODO
+		if (url != null && !url.equals(""))
+			n.setURL(url);
+		r = topicMap.putNode(n);
+		if (r.hasError()) {
+			result.addErrorString(r.getErrorString());
+		}
 		// We have an obligation to see if a parentLocator was passed in without a
 		// contextLocator -- which would be an error condition
 		if (parentLocator != null &&
 			!parentLocator.equals("") &&
 			contextLocator != null &&
 			!contextLocator.equals("")) {
-			
+			environment.logDebug("StructuredConversation.createNode-Parent "+n.toJSONString());
+			environment.logDebug("StructuredConversation.createNode-Parent-1 "+contextLocator+" | "+parentLocator);
+			((IParentChildContainer)n).addParentNode(contextLocator, parentLocator);
+			/*
 			r = topicMap.getNode(parentLocator, credentials);
 			if (r.hasError()) {
 				result.addErrorString(r.getErrorString());
@@ -119,25 +127,14 @@ public class StructuredConversationModel extends BaseModel implements IStructure
 			System.out.println("SCM-2 "+r.getErrorString()+" | "+r.getResultObject());
 			IProxy parent = (IProxy)r.getResultObject();
 			if (parent != null) {
-				// nodeModel is not implemented yet
-				//nodeModel.addParentNode(n, contextLocator, parent.getSmallImage(), parentLocator,  parent.getLabel(language));
-				//String contextLocator, String smallIcon, String locator, String subject
-				((IParentChildContainer)n).addParentNode(contextLocator, parentLocator);
+				environment.logDebug("StructuredConversation.createNode-Parent "+parent.toJSONString());
+				environment.logDebug("StructuredConversation.createNode-Parent-1 "+contextLocator+" | "+n.getLocator());
 				((IParentChildContainer)parent).addChildNode(contextLocator, n.getLocator(), null);
-				r = topicMap.putNode(parent);
-				if (r.hasError()) {
-					result.addErrorString(r.getErrorString());
-				}
 			} else {
 				//TODO this is a really bad situation -- missing parent
 				environment.logError("StructuredConversationModel Missing Parent "+parentLocator, null);
 			}
-		}
-		if (url != null && !url.equals(""))
-			n.setURL(url);
-		r = topicMap.putNode(n);
-		if (r.hasError()) {
-			result.addErrorString(r.getErrorString());
+			*/
 		}
 		r = relateNodeToUser(n, userLocator, provenanceLocator, credentials);
 		if (r.hasError())

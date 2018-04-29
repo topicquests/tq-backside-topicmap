@@ -4,7 +4,7 @@
     <groupId>org.topicquests</groupId>
     <artifactId>tq-backside-topicmap</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <name>tq-backside-topicmap</name>
     <url>https://github.com/topicquests/tq-backside-topicmap</url>
     <developers>

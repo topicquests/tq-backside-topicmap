@@ -479,6 +479,7 @@ public class TopicMapHandler  extends BaseHandler {
 				String lox = null;
 				if (locator != null && !locator.equals(""))
 					lox = locator;
+				//nodeType, parentLocator, contextLocator, locator, label, details, language,  url,  userId,  isPrivate
 				r = conModel.newConversationNode(nodeType, parentLoc, contextLoc, lox, label, det, language, url, userId, isPrivate);
 				if (r.getResultObject() != null) {
 					IProxy n = (IProxy)r.getResultObject();

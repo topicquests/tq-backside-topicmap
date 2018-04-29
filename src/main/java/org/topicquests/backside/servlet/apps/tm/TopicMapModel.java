@@ -19,26 +19,19 @@ import java.util.*;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.topicquests.backside.servlet.ServletEnvironment;
 import org.topicquests.backside.servlet.api.ICredentialsMicroformat;
 import org.topicquests.backside.servlet.apps.BaseModel;
-import org.topicquests.backside.servlet.apps.tm.api.IConversationTreeStruct;
 import org.topicquests.backside.servlet.apps.tm.api.ISocialBookmarkLegend;
 import org.topicquests.backside.servlet.apps.tm.api.ITagModel;
 import org.topicquests.backside.servlet.apps.tm.api.ITopicMapMicroformat;
 import org.topicquests.backside.servlet.apps.tm.api.ITopicMapModel;
 import org.topicquests.support.ResultPojo;
 import org.topicquests.support.api.IResult;
-import org.topicquests.ks.SystemEnvironment;
 import org.topicquests.ks.TicketPojo;
 import org.topicquests.ks.api.ICoreIcons;
 import org.topicquests.ks.api.ITQCoreOntology;
@@ -277,13 +270,12 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 			else
 				provenanceLocator = ((List<String>)op).get(0); //TODO that's a hack
 		}
+		String conversationParent = theTopicShell.getAsString(ITopicMapMicroformat.CONVERSATION_PARENT_LOCATOR);
+		String conversationContext = theTopicShell.getAsString(ITopicMapMicroformat.CONTEXT_LOCATOR);
+
 		environment.logDebug("TopicMapModel.newInstanceNode-x "+locator+" | "+typeLocator+" | "+
 				label+" | "+description+" | "+lang+" "+userId);
 
-		//Added feature
-		JSONObject extras = null;//(JSONObject)theTopicShell.get(ITopicMapMicroformat.EXTRAS);
-		if (extras != null)
-			System.out.println("NEWINSTANCE "+extras.toJSONString());
 		boolean isPrivate = false;
 		IResult r;
 		if (isp.equalsIgnoreCase("t"))
@@ -312,7 +304,14 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 		environment.logDebug("TopicMapModel.newInstanceNode-2 "+n.toJSONString());
 		if (url != null && !url.equals(""))
 			n.setURL(url);
-	/*		if (extras != null) {
+		
+		
+	/*				//Added feature
+		JSONObject extras = null;//(JSONObject)theTopicShell.get(ITopicMapMicroformat.EXTRAS);
+		if (extras != null)
+			System.out.println("NEWINSTANCE "+extras.toJSONString());
+
+	  if (extras != null) {
 				JSONObject jo = n.getData();
 				Iterator<String>itr = extras.keySet().iterator();
 				String key;
@@ -361,6 +360,10 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 		r = topicMap.putNode(n);
 		if (r.hasError())
 			result.addErrorString(r.getErrorString());
+		if (conversationParent != null && !conversationParent.equals("") &&
+				conversationContext != null && !conversationContext.equals(""))
+				((IParentChildContainer)n).addParentNode(conversationContext, conversationParent);
+
 		environment.logDebug("TopicMapModel.newInstanceNode-3 "+r.getErrorString()+" | "+n.toJSONString());
 		
 		r = relateNodeToUser(n, userId, provenanceLocator, credentials);

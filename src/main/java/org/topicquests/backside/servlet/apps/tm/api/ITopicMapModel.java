@@ -20,6 +20,8 @@ import java.util.List;
 import net.minidev.json.JSONObject;
 
 import org.topicquests.support.api.IResult;
+import org.topicquests.backside.servlet.api.ICredentialsMicroformat;
+import org.topicquests.ks.api.ITQCoreOntology;
 import org.topicquests.ks.api.ITicket;
 
 /**
@@ -165,9 +167,26 @@ public interface ITopicMapModel {
 	/**
 	 * <p>Allow for a simple shell topic, crafted at web clients, to be filled out to a full topic and persisted
 	 * and returned.</p>
+	 * <p>Standard keys are:<br/>
+	 * <ol>
+	 * <ul>ITopicMapMicroformat.TOPIC_LOCATOR</ul>
+	 * <ul>ITopicMapMicroformat.PARENT_LOCATOR-can be null</ul>
+	 * <ul>ITopicMapMicroformat.LANGUAGE</ul>
+	 * <ul>ICredentialsMicroformat.USER_ID</ul>
+	 * <ul>ITopicMapMicroformat.TOPIC_LABEL</ul>
+	 * <ul>ITopicMapMicroformat.TOPIC_DETAILS</ul>
+	 * <ul>ITopicMapMicroformat.SMALL_IMAGE_PATh</ul>
+	 * <ul>ITopicMapMicroformat.LARGE_IMAGE_PATH</ul>
+	 * <ul>ITopicMapMicroformat.IS_PRIVATE</ul>
+	 * <ul>ITopicMapMicroformat.URL</ul>
+	 * <ul>ITQCoreOntology.SCOPE_LIST_PROPERTY_TYPE-for ProvenanceLocator-can be null</ul>
+	 * <ul>ITopicMapMicroformat.CONVERSATION_PARENT_LOCATOR-can be null</code>
+	 * <ul>ITopicMapMicroformat.CONTEXT_LOCATOR-can be null</code></li>
+	 * </ol>
+	 * <NOTE>extras not implemented at this time</NOTE>
 	 * <p>Also looks for a <em>extras</em> property.</p>
 	 * <p><code>extras</code> field is a JSON object which an add known
-	 * key/value pairs such as url, and dealing with parent and child nodes</p>
+	 * key/value pairs</p>
 	 * <p><em>WARNING</em> key/value pairs will overwrite any existing
 	 * key/value pairs in the node. It is wise to choose key/value pairs
 	 * which do not already exist in an otherwise empty node.</p>
@@ -178,6 +197,10 @@ public interface ITopicMapModel {
 	IResult newInstanceNode(JSONObject theTopicShell, ITicket credentials);
 	
 	IResult newSubclassNode(JSONObject theTopicShell, ITicket credentials);
+	
+	//////////////////////////////
+	// Special instance types
+	//////////////////////////////
 	
 	/**
 	 * Cargo must include<br/>
