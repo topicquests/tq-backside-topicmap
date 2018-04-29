@@ -45,7 +45,7 @@ import org.topicquests.ks.api.ITQCoreOntology;
 import org.topicquests.ks.tm.api.IDataProvider;
 import org.topicquests.ks.api.ITicket;
 import org.topicquests.ks.tm.Proxy;
-import org.topicquests.ks.tm.api.IChildStruct;
+import org.topicquests.ks.tm.api.IConversationNode;
 import org.topicquests.ks.api.INodeTypes;
 import org.topicquests.ks.tm.api.IParentChildContainer;
 import org.topicquests.ks.tm.api.IProxy;
@@ -75,7 +75,7 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 	 */
 	@Override
 	public IResult putTopic(JSONObject topic) {
-		IProxy n = new Proxy(topic,dbProvider);
+		IProxy n = new Proxy(topic);
 		IResult result = topicMap.putNode(n);
 		return result;
 	}
@@ -233,58 +233,20 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 			String lox;
 			while (itr.hasNext()) {
 				jo = itr.next().getData();
-				lox = jo.getAsString(IChildStruct.LOCATOR);
+				lox = jo.getAsString(IConversationNode.LOCATOR);
 				map.put(lox, jo);
 			}
 		}
 		return result;
 	}
 
-	/**
-	 * Recursive walk down a parent-child tree to populate <code>parent</code>
-	 * @param parent
-	 * @param root
-	 * @param contextLocator
-	 * @param credentials
-	 * @return
-	 */
-	private IResult _collectParentChildTree(IConversationTreeStruct parent, IProxy root, String contextLocator, ITicket credentials) {
-		IResult result = new ResultPojo();
-		IResult r = _listTreeChildNodesJSON(root, contextLocator, credentials);
-		if (r.hasError())
-			result.addErrorString(r.getErrorString());
-		JSONObject snappers = (JSONObject)r.getResultObject();
-		//For each kid:
-		// create a ChildNodeStruct
-		// recurse to fill that kid's tree branches
-		// add that ChildNodeStruct to parent
-		if (snappers != null && snappers.size() > 0) {
-			Iterator<String> itr = snappers.keySet().iterator();
-			JSONObject jo;
-			String key;
-			IConversationTreeStruct snapper;
-			while (itr.hasNext()) {
-				key = itr.next();
-				jo = (JSONObject)snappers.get(key);
-				snapper = new ConTreeStruct(jo);
-				r = _collectParentChildTree(snapper, new Proxy(jo, dbProvider), contextLocator, credentials);
-				parent.addChild(snapper.getData());
-				if (r.hasError())
-					result.addErrorString(r.getErrorString());
-			}
-		}
-		return result;
-	}
 	
 	@Override 
-	public IResult collectParentChildTree(String rootNodeLocator, String contextLocator, ITicket credentials) {
-		IResult r = topicMap.getNode(rootNodeLocator, credentials);
-		IProxy root = (IProxy)r.getResultObject();
-		System.out.println("COLPARCHILTR "+contextLocator+" "+root.toJSONString());
-		IConversationTreeStruct p = new ConTreeStruct(root.getData());
-		//the following call recursively populates p
-		IResult result = _collectParentChildTree(p, root, contextLocator, credentials);
-		result.setResultObject(p.getData());
+	public IResult collectParentChildTree(String rootNodeLocator, String language, ITicket credentials) {
+		IResult result = topicMap.fetchConversation(rootNodeLocator, language, credentials);
+		IConversationNode n = (IConversationNode)result.getResultObject();
+		if (n != null)
+			result.setResultObject(n.getData());
 		return result;
 	}
 
@@ -357,9 +319,9 @@ public class TopicMapModel extends BaseModel implements ITopicMapModel {
 				while (itr.hasNext()) {
 					key = itr.next();
 					if (key.equals(ITopicMapMicroformat.ADD_CHILD_NODE)) {
-						//THIS is a partial IChildStruct
+						//THIS is a partial IConversationNode
 						// We must fetch its locator (parent)
-						// and finish the IChildStruct
+						// and finish the IConversationNode
 						//TODO
 						JSONObject kid = (JSONObject)extras.get(key);
 						String parent = kid.getAsString("locator");

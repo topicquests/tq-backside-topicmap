@@ -347,10 +347,8 @@ public class TopicMapHandler  extends BaseHandler {
 			}
 		} else if (verb.equals(ITopicMapMicroformat.COLLECT_CONVERSATION_TREE)) {
 			String locator = notNullString(jsonObject.getAsString(ITopicMapMicroformat.TOPIC_LOCATOR));
-			String context = notNullString(jsonObject.getAsString(ITopicMapMicroformat.CONTEXT_LOCATOR));
-			String sortBy = jsonObject.getAsString(IQueryMicroformat.SORT_BY);
-			String sortDir = jsonObject.getAsString(IQueryMicroformat.SORT_DIR);
-			r = model.collectParentChildTree(locator, context, credentials);
+			String language = notNullString(jsonObject.getAsString(ITopicMapMicroformat.LANGUAGE));
+			r = model.collectParentChildTree(locator, language, credentials);
 			System.out.println("COLLECT_TREE "+r.getResultObject());
 			if (r.getResultObject() != null) {
 				JSONObject n = (JSONObject)r.getResultObject();
