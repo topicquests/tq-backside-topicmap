@@ -469,6 +469,7 @@ public class TopicMapHandler  extends BaseHandler {
 				String label = cargo.getAsString("label");
 				String details = cargo.getAsString("details");
 				String language = cargo.getAsString("Lang");
+				String provenanceLocator = cargo.getAsString(ITopicMapMicroformat.PROVENANCE_LOCATOR);
 				String url = cargo.getAsString("url");
 				boolean isPrivate = false;
 				if (pvt.equalsIgnoreCase("T"))
@@ -480,7 +481,7 @@ public class TopicMapHandler  extends BaseHandler {
 				if (locator != null && !locator.equals(""))
 					lox = locator;
 				//nodeType, parentLocator, contextLocator, locator, label, details, language,  url,  userId,  isPrivate
-				r = conModel.newConversationNode(nodeType, parentLoc, contextLoc, lox, label, det, language, url, userId, isPrivate);
+				r = conModel.newConversationNode(nodeType, parentLoc, contextLoc, lox, label, det, language, url, userId, provenanceLocator, isPrivate);
 				if (r.getResultObject() != null) {
 					IProxy n = (IProxy)r.getResultObject();
 					System.out.println("GETTOPICBYURL "+n);

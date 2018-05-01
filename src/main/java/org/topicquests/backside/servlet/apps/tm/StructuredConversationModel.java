@@ -55,7 +55,7 @@ public class StructuredConversationModel extends BaseModel implements IStructure
 	 */
 	@Override
 	public IResult newConversationNode(String nodeType, String parentLocator, String contextLocator, String locator, String label, String details,
-			String language, String url, String userId, boolean isPrivate) {
+			String language, String url, String userId, String provenanceLocator, boolean isPrivate) {
 		String lox = locator;
 		if (lox == null) 
 			lox = UUID.randomUUID().toString();
@@ -91,15 +91,14 @@ public class StructuredConversationModel extends BaseModel implements IStructure
 			return result;
 		}
 		return createNode(nodeType, lox, parentLocator, contextLocator, label, details, language,
-							smallIcon, largeIcon, url, userId, isPrivate);
+							smallIcon, largeIcon, url, userId, isPrivate, provenanceLocator);
 	}
 
 	private IResult createNode(String nodeType, String locator, String parentLocator, String contextLocator,
 					String label, String details, String language, String smallIcon, String largeIcon, String url,
-					String userLocator, boolean isPrivate) {
+					String userLocator, boolean isPrivate, String provenanceLocator) {
 		IResult result = new ResultPojo();
 		IResult r = null;
-		String provenanceLocator = null;//ToDO
 		IProxy n = nodeModel.newInstanceNode(locator, nodeType, label, details, language, userLocator,
 				provenanceLocator,
 				smallIcon, largeIcon, isPrivate);
@@ -110,32 +109,32 @@ public class StructuredConversationModel extends BaseModel implements IStructure
 		if (r.hasError()) {
 			result.addErrorString(r.getErrorString());
 		}
+		/////////////////////////
+		// Just created a new conversation node.
+		// Now, we ask if it has a parent
+		//  If so, we add that parent to this node
+		//  which means the parent node now has a new child
+		// Parents always exist in some context, so the pair
+		// { contextLocator, parentLocator } are critical
+		// A conversation root node's child nodes will have
+		//   contextLocator == parentLocator
+		// All other children below that will have a different
+		//   context and parent
+		/////////////////////////
+		//debug test
+		//r = topicMap.getNode(n.getLocator(), credentials);
+		//environment.logDebug("StructuredConversation.debug "+r.getErrorString()+" "+r.getResultObject());
 		// We have an obligation to see if a parentLocator was passed in without a
 		// contextLocator -- which would be an error condition
-		if (parentLocator != null &&
-			!parentLocator.equals("") &&
-			contextLocator != null &&
-			!contextLocator.equals("")) {
+		if (parentLocator != null && !parentLocator.equals("") &&
+			contextLocator != null && !contextLocator.equals("")) {
 			environment.logDebug("StructuredConversation.createNode-Parent "+n.toJSONString());
 			environment.logDebug("StructuredConversation.createNode-Parent-1 "+contextLocator+" | "+parentLocator);
 			((IParentChildContainer)n).addParentNode(contextLocator, parentLocator);
-			/*
-			r = topicMap.getNode(parentLocator, credentials);
-			if (r.hasError()) {
-				result.addErrorString(r.getErrorString());
-			}
-			System.out.println("SCM-2 "+r.getErrorString()+" | "+r.getResultObject());
-			IProxy parent = (IProxy)r.getResultObject();
-			if (parent != null) {
-				environment.logDebug("StructuredConversation.createNode-Parent "+parent.toJSONString());
-				environment.logDebug("StructuredConversation.createNode-Parent-1 "+contextLocator+" | "+n.getLocator());
-				((IParentChildContainer)parent).addChildNode(contextLocator, n.getLocator(), null);
-			} else {
-				//TODO this is a really bad situation -- missing parent
-				environment.logError("StructuredConversationModel Missing Parent "+parentLocator, null);
-			}
-			*/
 		}
+		/////////////
+		// Now, relate the new node to its creator
+		/////////////
 		r = relateNodeToUser(n, userLocator, provenanceLocator, credentials);
 		if (r.hasError())
 			result.addErrorString(r.getErrorString());

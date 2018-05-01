@@ -36,11 +36,12 @@ public interface IStructuredConversationModel {
 	 * @param language
 	 * @param url
 	 * @param userId
+	 * @param provenanceLocator
 	 * @param isPrivate
 	 * @return can return an error message "BadNodeType"
 	 */
 	IResult newConversationNode(String nodeType, String parentLocator, String contextLocator, String locator,
-			String label, String details, String language, String url, String userId, boolean isPrivate);
+			String label, String details, String language, String url, String userId, String provenanceLocator, boolean isPrivate);
 
 	/**
 	 * Add a <em>transcluded</em> child to a parent in a particular context
