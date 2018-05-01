@@ -126,6 +126,7 @@ public class StructuredConversationModel extends BaseModel implements IStructure
 		//environment.logDebug("StructuredConversation.debug "+r.getErrorString()+" "+r.getResultObject());
 		// We have an obligation to see if a parentLocator was passed in without a
 		// contextLocator -- which would be an error condition
+		environment.logDebug("StructuredConversation.createNode-Parent "+contextLocator+ " | "+parentLocator);
 		if (parentLocator != null && 
 			contextLocator != null && !contextLocator.equals("")) {
 			environment.logDebug("StructuredConversation.createNode-Parent "+n.toJSONString());
